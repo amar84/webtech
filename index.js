@@ -1,127 +1,216 @@
-var SERVER_NAME = 'user-api'
+var SERVER_NAME = 'patient-api'
 var PORT = process.env.PORT;
 
 
 var restify = require('restify')
 
-  // Get a persistence engine for the users
-  , usersSave = require('save')('users')
+  
+  , patientsSave = require('save')('patients')
 
   // Create the restify server
   , server = restify.createServer({ name: SERVER_NAME})
 
   server.listen(PORT, function () {
   console.log('Server %s listening at %s', server.name, server.url)
-  console.log('Resources:')
-  console.log(' /users')
-  console.log(' /users/:id')  
+  console.log('Information about the patients:')
+  console.log(' ####  /pateints   ####')
+  console.log(' /patients/:id')  
 })
 
 server
-  // Allow the use of POST
+ 
   .use(restify.fullResponse())
 
-  // Maps req.body to req.params so there is no switching between them
+  
   .use(restify.bodyParser())
 
 // Get all users in the system
-server.get('/users', function (req, res, next) {
+server.get('/patients', function (req, res, next) {
 
-  // Find every entity within the given collection
-  usersSave.find({}, function (error, users) {
+ 
+  patientsSave.find({}, function (error, patients) {
 
-    // Return all of the users in the system
-    res.send(users)
+   
+    res.send(patients)
   })
 })
 
 // Get a single user by their user id
-server.get('/users/:id', function (req, res, next) {
+server.get('/patients/:id', function (req, res, next) {
 
-  // Find a single user by their id within save
-  usersSave.findOne({ _id: req.params.id }, function (error, user) {
+ 
+  patientsSave.findOne({ _id: req.params.id }, function (error, patient) {
 
-    // If there are any errors, pass them to next in the correct format
+   
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
 
-    if (user) {
-      // Send the user if no issues
-      res.send(user)
+    if (patient) {
+      
+      res.send(patient)
     } else {
-      // Send 404 header if the user doesn't exist
+     
       res.send(404)
     }
   })
 })
 
 // Create a new user
-server.post('/users', function (req, res, next) {
+server.post('/patients', function (req, res, next) {
 
-  // Make sure name is defined
-  if (req.params.name === undefined ) {
-    // If there are any errors, pass them to next in the correct format
-    return next(new restify.InvalidArgumentError('name must be supplied'))
+
+  if (req.params.first_name === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('first_name must be supplied'))
   }
-  if (req.params.age === undefined ) {
-    // If there are any errors, pass them to next in the correct format
-    return next(new restify.InvalidArgumentError('age must be supplied'))
+  if (req.params.last_name === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('last_name must be supplied'))
   }
-  var newUser = {
-		name: req.params.name, 
-		age: req.params.age
+
+  
+  if (req.params.address === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('address must be supplied'))
+  }
+  if (req.params.date_of_birth === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('date_of_birth must be supplied'))
+  }
+  
+  if (req.params.department === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('department must be supplied'))
+  }
+  if (req.params.doctor === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('doctor must be supplied'))
+  }
+  var newPatient = {
+		first_name: req.params.first_name, 
+    last_name: req.params.last_name,
+    address: req.params.address,
+    date_of_birth: req.params.date_of_birth,
+    department: req.params.department,
+    doctor: req.params.doctor
 	}
 
   // Create the user using the persistence engine
-  usersSave.create( newUser, function (error, user) {
+  patientsSave.create( newPatient, function (error, patient) {
 
-    // If there are any errors, pass them to next in the correct format
+    
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
 
-    // Send the user if no issues
-    res.send(201, user)
+  
+    res.send(201, patient)
   })
 })
 
-// Update a user by their id
-server.put('/users/:id', function (req, res, next) {
+//server.get('/patients/:id/records', function (req, res, next) {
+ // patientRecordSave.find({ patient_id: req.params - id }, function (error, patientRecord) {
+   //   res.send(patientRecord);
+  //})
+//})
 
-  // Make sure name is defined
-  if (req.params.name === undefined ) {
-    // If there are any errors, pass them to next in the correct format
+server.post('/patients/:id/records', function (req, res, next) {
+
+if (req.params.bloodgroup == undefined) {
+    return next(new restify.InvalidArgumentError('blood group must be supplied'))
+}
+
+if (req.params.date_of_birth == undefined) {
+    return next(new restify.InvalidArgumentError('date_of_birth must be supplied'))
+}
+
+if (req.params.heartrate == undefined) {
+    return next(new restify.InvalidArgumentError('heartrate must be supplied'))
+}
+
+if (req.params.bloodpressure == undefined) {
+    return next(new restify.InvalidArgumentError('bloodpressure must be supplied'))
+}
+
+if (req.params.nurse == undefined) {
+    return next(new restify.InvalidArgumentError('nurse must be supplied'))
+}
+
+
+// input of patients record
+var newPatientRecord = {
+    Patient_id: req.params.id,
+    bloodgroup: req.params.bloodgroup,
+    date_of_birth: req.params.date_of_birth,
+    heartrate: req.params.heartrate,
+    bloodpressure: req.params.bloodpressure,
+    nurse: req.params.nurse
+}
+patientRecordSave.create( newPatientRecord,function(error, patientRecord) {
+
+    if  (error) return next(new errors.BadRequestError(JSON.stringify(error.errors)))
+
+ res.send(201,newPatientRecord)   
+})
+
+})
+// Update a user by their id
+server.put('/patients/:id', function (req, res, next) {
+
+  if (req.params.first_name === undefined ) {
+    
     return next(new restify.InvalidArgumentError('name must be supplied'))
   }
-  if (req.params.age === undefined ) {
-    // If there are any errors, pass them to next in the correct format
+  if (req.params.last_name === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('age must be supplied'))
+  }
+
+  
+  if (req.params.address === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('name must be supplied'))
+  }
+  if (req.params.date_of_birth === undefined ) {
+    
     return next(new restify.InvalidArgumentError('age must be supplied'))
   }
   
-  var newUser = {
-		_id: req.params.id,
-		name: req.params.name, 
-		age: req.params.age
+  if (req.params.department === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('name must be supplied'))
+  }
+  if (req.params.doctor === undefined ) {
+    
+    return next(new restify.InvalidArgumentError('age must be supplied'))
+  }
+  var newPatient = {
+		first_name: req.params.first_name, 
+    last_name: req.params.last_name,
+    address: req.params.address,
+    date_of_birth: req.params.date_of_birth,
+    department: req.params.department,
+    doctor: req.params.doctor
 	}
+ 
   
-  // Update the user with the persistence engine
-  usersSave.update(newUser, function (error, user) {
+  usersSave.update(newPatient, function (error, patient) {
 
-    // If there are any errors, pass them to next in the correct format
+    
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
 
-    // Send a 200 OK response
+    
     res.send(200)
   })
 })
 
 // Delete user with the given id
-server.del('/users/:id', function (req, res, next) {
+server.del('/patients/:id', function (req, res, next) {
 
-  // Delete the user with the persistence engine
-  usersSave.delete(req.params.id, function (error, user) {
+  
+  usersSave.delete(req.params.id, function (error, patient) {
 
-    // If there are any errors, pass them to next in the correct format
+    
     if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
 
-    // Send a 200 OK response
+    
     res.send()
   })
 })
