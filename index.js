@@ -1,133 +1,212 @@
-var SERVER_NAME = 'user-api'
+var SERVER_NAME = 'patient-api'
 var PORT = (process.env.PORT || 5000);
 var HOST = '127.0.0.1';
 
-
+var counterGetRequest = 0;
 var errors = require('restify-errors');
 var restify = require('restify')
 
-  // Get a persistence engine for the users
-  , usersSave = require('save')('users')
+  
+  , usersSave = require('save')('patients')
 
-  // Create the restify server
+  
   , server = restify.createServer({ name: SERVER_NAME})
 
   server.listen(PORT, HOST, function () {
   console.log('Server %s listening at %s', server.name, server.url)
-  console.log('Resources:')
-  console.log(' /users')
-  console.log(' /users/:id')  
+  console.log('information of the patients:')
+  console.log(' ####  /patinets #####')
+  console.log(' /patients/:id')  
 })
 
 server
-  // Allow the use of POST
+  
   .use(restify.plugins.fullResponse())
 
-  // Maps req.body to req.params
+  
   .use(restify.plugins.bodyParser())
 
-// Get all users in the system
-server.get('/users', function (req, res, next) {
 
-  // Find every entity within the given collection
+server.get('/patients', function (req, res, next) {
+
+  
   usersSave.find({}, function (error, users) {
 
-    // Return all of the users in the system
+    
     res.send(users)
   })
 })
 
 // Get a single user by their user id
-server.get('/users/:id', function (req, res, next) {
-  console.log('GET request: /users req.params=>' + JSON.stringify(req.params));
-  console.log('GET request: /users req.body=>' + JSON.stringify(req.body));
-  // Find a single user by their id within save
+server.get('/patients/:id', function (req, res, next) {
+  console.log('GET request: /patients req.params=>' + JSON.stringify(req.params));
+  console.log('GET request: /patients req.body=>' + JSON.stringify(req.body));
+  
   usersSave.findOne({ _id: req.params.id }, function (error, user) {
 
-    // If there are any errors, pass them to next in the correct format
+    
     if (error) return next(new Error(JSON.stringify(error.errors)))
 
     if (user) {
-      // Send the user if no issues
+     
       res.send(user)
     } else {
-      // Send 404 header if the user doesn't exist
+    
       res.send(404)
     }
   })
 })
 
 // Create a new user
-server.post('/users', function (req, res, next) {
-  console.log('POST request: /users req.params=>' + JSON.stringify(req.params));
-  console.log('POST request: /users req.body=>' + JSON.stringify(req.body));
-  // Make sure name is defined
-  if (req.body.name === undefined ) {
-    // If there are any errors, pass them to next in the correct format
-    return next(new errors.BadRequestError('name must be supplied'))
-  }
-  if (req.body.age === undefined ) {
-    // If there are any errors, pass them to next in the correct format
-    return next(new errors.BadRequestError('age must be supplied'))
-  }
-  var newUser = {
-		name: req.body.name, 
-		age: req.body.age
+server.post('/patients', function (req, res, next) {
+  console.log('POST request: /patients req.params=>' + JSON.stringify(req.params));
+  console.log('POST request: /patients req.body=>' + JSON.stringify(req.body));
+  
+  if (req.body.first_name == undefined) {
+    return next(new errors.BadRequestError('first_name must be supplied'))
+}
+
+if (req.body.last_name == undefined) {
+    return next(new errors.BadRequestError('last_name must be supplied'))
+}
+
+if (req.body.address == undefined) {
+    return next(new errors.BadRequestError('address must be supplied'))
+}
+
+    if (req.body.date_of_birth == undefined) {
+        return next(new errors.BadRequestError('date_of_birth must be supplied'))
+    }
+
+    if (req.body.department == undefined) {
+        return next(new errors.BadRequestError('department must be supplied'))
+    }
+
+    if (req.body.doctor == undefined) {
+        return next(new errors.BadRequestError('doctor must be supplied'))
+
+}
+  var newPatient = {
+
+    first_name:  req.body.first_name,
+    last_name: req.body.last_name,
+    address: req.body.address,
+    date_of_birth: req.body.date_of_birth,
+    department: req.body.department,
+    doctor: req.body.doctor
+
 	}
 
-  // Create the user using the persistence engine
-  usersSave.create( newUser, function (error, user) {
+ 
+  usersSave.create( newPatient, function (error, patient) {
 
-    // If there are any errors, pass them to next in the correct format
+    
     if (error) return next(new Error(JSON.stringify(error.errors)))
 
-    // Send the user if no issues
-    res.send(201, user)
+  
+    res.send(201, patient)
   })
 })
 
+
+
+
 // Update a user by their id
-server.put('/users/:id', function (req, res, next) {
-  console.log('PUT request: /users req.params=>' + JSON.stringify(req.params));
-  console.log('PUT request: /users req.body=>' + JSON.stringify(req.body));
-  // Make sure name is defined
+server.put('/patients/:id', function (req, res, next) {
+  console.log('PUT request: /patients req.params=>' + JSON.stringify(req.params));
+  console.log('PUT request: /patients req.body=>' + JSON.stringify(req.body));
+ 
   if (req.body.name === undefined ) {
-    // If there are any errors, pass them to next in the correct format
+   
     return next(new errors.BadRequestError('name must be supplied'))
   }
   if (req.body.age === undefined ) {
-    // If there are any errors, pass them to next in the correct format
+    
     return next(new errors.BadRequestError('age must be supplied'))
   }
   
-  var newUser = {
+  var newPatient = {
 		_id: req.params.id,
-		name: req.body.name, 
-		age: req.body.age
+        first_name:  req.body.first_name,
+        last_name: req.body.last_name,
+        address: req.body.address,
+        date_of_birth: req.body.date_of_birth,
+        department: req.body.department,
+        doctor: req.body.doctor
+    
 	}
   
-  // Update the user with the persistence engine
-  usersSave.update(newUser, function (error, user) {
+ 
+  usersSave.update(newPatient, function (error, patient) {
 
-    // If there are any errors, pass them to next in the correct format
+    
     if (error) return next(new Error(JSON.stringify(error.errors)))
 
-    // Send a 200 OK response
-    res.send(200, user)
+    
+    res.send(200, patient)
   })
+})
+
+
+server.get('/patients/:id/records', function (req, res, next) {
+    patientRecordSave.find({ patient_id: req.params - id }, function (error, patientRecord) {
+        res.send(patientRecord);
+    })
+})
+
+
+
+server.post('/patients/:id/records', function (req, res, next){
+
+if (req.params.bloodgroup == undefined) {
+    return next(new errors.BadRequestError('blood group must be supplied'))
+}
+
+if (req.params.date_of_birth == undefined) {
+    return next(new errors.BadRequestError('date_of_birth must be supplied'))
+}
+
+if (req.params.heartrate == undefined) {
+    return next(new errors.BadRequestError('heartrate must be supplied'))
+}
+
+if (req.params.bloodpressure == undefined) {
+    return next(new errors.BadRequestError('bloodpressure must be supplied'))
+}
+
+if (req.params.nurse == undefined) {
+    return next(new errors.BadRequestError('nurse must be supplied'))
+}
+
+
+// input of patients record
+var newPatientRecord = {
+    Patient_id: req.body.id,
+    bloodgroup: req.body.bloodgroup,
+    date_of_birth: req.body.date_of_birth,
+    heartrate: req.body.heartrate,
+    bloodpressure: req.body.bloodpressure,
+    nurse: req.body.nurse
+}
+patientRecordSave.create( newPatientRecord,function(error, patientRecord) {
+
+    if  (error) return next(new errors.BadRequestError(JSON.stringify(error.errors)))
+
+ res.send(201,newPatientRecord)   
+})
 })
 
 // Delete user with the given id
-server.del('/users/:id', function (req, res, next) {
+server.del('/patients/:id', function (req, res, next) {
 
-  // Delete the user with the persistence engine
-  usersSave.delete(req.params.id, function (error, user) {
+  
+  usersSave.delete(req.params.id, function (error, patient) {
 
-    // If there are any errors, pass them to next in the correct format
+    
     if (error) return next(new Error(JSON.stringify(error.errors)))
 
-    // Send a 200 OK response
-    res.send(user)
+    
+    res.send(patient)
   })
 })
 
