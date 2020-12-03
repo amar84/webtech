@@ -1,8 +1,9 @@
 var SERVER_NAME = 'user-api'
-var PORT = 8000;
+var PORT = (process.env.PORT || 5000);
 var HOST = '127.0.0.1';
 
 
+var errors = require('restify-errors');
 var restify = require('restify')
 
   // Get a persistence engine for the users
@@ -20,10 +21,10 @@ var restify = require('restify')
 
 server
   // Allow the use of POST
-  .use(restify.fullResponse())
+  .use(restify.plugins.fullResponse())
 
-  // Maps req.body to req.params so there is no switching between them
-  .use(restify.bodyParser())
+  // Maps req.body to req.params
+  .use(restify.plugins.bodyParser())
 
 // Get all users in the system
 server.get('/users', function (req, res, next) {
@@ -38,12 +39,13 @@ server.get('/users', function (req, res, next) {
 
 // Get a single user by their user id
 server.get('/users/:id', function (req, res, next) {
-
+  console.log('GET request: /users req.params=>' + JSON.stringify(req.params));
+  console.log('GET request: /users req.body=>' + JSON.stringify(req.body));
   // Find a single user by their id within save
   usersSave.findOne({ _id: req.params.id }, function (error, user) {
 
     // If there are any errors, pass them to next in the correct format
-    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+    if (error) return next(new Error(JSON.stringify(error.errors)))
 
     if (user) {
       // Send the user if no issues
@@ -57,26 +59,27 @@ server.get('/users/:id', function (req, res, next) {
 
 // Create a new user
 server.post('/users', function (req, res, next) {
-
+  console.log('POST request: /users req.params=>' + JSON.stringify(req.params));
+  console.log('POST request: /users req.body=>' + JSON.stringify(req.body));
   // Make sure name is defined
-  if (req.params.name === undefined ) {
+  if (req.body.name === undefined ) {
     // If there are any errors, pass them to next in the correct format
-    return next(new restify.InvalidArgumentError('name must be supplied'))
+    return next(new errors.BadRequestError('name must be supplied'))
   }
-  if (req.params.age === undefined ) {
+  if (req.body.age === undefined ) {
     // If there are any errors, pass them to next in the correct format
-    return next(new restify.InvalidArgumentError('age must be supplied'))
+    return next(new errors.BadRequestError('age must be supplied'))
   }
   var newUser = {
-		name: req.params.name, 
-		age: req.params.age
+		name: req.body.name, 
+		age: req.body.age
 	}
 
   // Create the user using the persistence engine
   usersSave.create( newUser, function (error, user) {
 
     // If there are any errors, pass them to next in the correct format
-    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+    if (error) return next(new Error(JSON.stringify(error.errors)))
 
     // Send the user if no issues
     res.send(201, user)
@@ -85,31 +88,32 @@ server.post('/users', function (req, res, next) {
 
 // Update a user by their id
 server.put('/users/:id', function (req, res, next) {
-
+  console.log('PUT request: /users req.params=>' + JSON.stringify(req.params));
+  console.log('PUT request: /users req.body=>' + JSON.stringify(req.body));
   // Make sure name is defined
-  if (req.params.name === undefined ) {
+  if (req.body.name === undefined ) {
     // If there are any errors, pass them to next in the correct format
-    return next(new restify.InvalidArgumentError('name must be supplied'))
+    return next(new errors.BadRequestError('name must be supplied'))
   }
-  if (req.params.age === undefined ) {
+  if (req.body.age === undefined ) {
     // If there are any errors, pass them to next in the correct format
-    return next(new restify.InvalidArgumentError('age must be supplied'))
+    return next(new errors.BadRequestError('age must be supplied'))
   }
   
   var newUser = {
 		_id: req.params.id,
-		name: req.params.name, 
-		age: req.params.age
+		name: req.body.name, 
+		age: req.body.age
 	}
   
   // Update the user with the persistence engine
   usersSave.update(newUser, function (error, user) {
 
     // If there are any errors, pass them to next in the correct format
-    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+    if (error) return next(new Error(JSON.stringify(error.errors)))
 
     // Send a 200 OK response
-    res.send(200)
+    res.send(200, user)
   })
 })
 
@@ -120,10 +124,10 @@ server.del('/users/:id', function (req, res, next) {
   usersSave.delete(req.params.id, function (error, user) {
 
     // If there are any errors, pass them to next in the correct format
-    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+    if (error) return next(new Error(JSON.stringify(error.errors)))
 
     // Send a 200 OK response
-    res.send()
+    res.send(user)
   })
 })
 
