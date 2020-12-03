@@ -1,16 +1,16 @@
 {
-    "name": "UserApi",
-    "version": "2.0.0",
-    "description": "REST API - Users",
+    "name": "lab04heroku",
+    "version": "1.0.0",
+    "description": "Users API",
     "dependencies": {
-        "restify": "=8.5.1",
-        "save": "=2.4.0"
-    },
-    "author": "amar",
-    "private": true,
-    "main": "index.js",
-    "scripts":{
-"start":"node index.js"
+        "restify": "4.1.1",
+		"save": "2.3.0"
 
-    }
+    },
+    "author": "Amar",
+	"private": true,
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js"
+	}
 }
