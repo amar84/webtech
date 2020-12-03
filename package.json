@@ -1,7 +1,7 @@
 {
-    "name": "lab04heroku",
+    "name": "patients-Api",
     "version": "1.0.0",
-    "description": "Users API",
+    "description": "REST API - Users",
     "dependencies": {
         "restify": "4.1.1",
 		"save": "2.3.0"
@@ -9,8 +9,9 @@
     },
     "author": "Amar",
 	"private": true,
-	"main": "index.js",
-	"scripts": {
+    "main": "index.js",
+    "scripts": {
 		"start": "node index.js"
 	}
+    
 }
