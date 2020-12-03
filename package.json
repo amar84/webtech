@@ -2,27 +2,15 @@
     "name": "UserApi",
     "version": "2.0.0",
     "description": "REST API - Users",
-   
     "dependencies": {
         "restify": "=8.5.1",
         "save": "=2.4.0"
     },
-     "engines": {
-  "node": "14.15.1",
-  "npm": "6.14.9"
-},
     "author": "amar",
     "private": true,
     "main": "index.js",
     "scripts":{
-"scripts": {
-"dev": "react-scripts start",
-"start": "serve -s build",
-"build": "react-scripts build",
-"test": "react-scripts test --env=jsdom",
-"eject": "react-scripts eject",
-"heroku-postbuild": "npm run build"
-
+"start":"node index.js"
 
     }
 }
