@@ -60,38 +60,35 @@ server.post('/patients', function (req, res, next) {
 
   if (req.params.first_name === undefined ) {
     
-    return next(new restify.InvalidArgumentError('first_name must be supplied'))
+    return next(new restify.InvalidArgumentError('name must be supplied'))
   }
   if (req.params.last_name === undefined ) {
     
-    return next(new restify.InvalidArgumentError('last_name must be supplied'))
+    return next(new restify.InvalidArgumentError('email must be supplied'))
   }
 
   
   if (req.params.address === undefined ) {
     
-    return next(new restify.InvalidArgumentError('address must be supplied'))
+    return next(new restify.InvalidArgumentError('street must be supplied'))
   }
   if (req.params.date_of_birth === undefined ) {
     
-    return next(new restify.InvalidArgumentError('date_of_birth must be supplied'))
+    return next(new restify.InvalidArgumentError('city must be supplied'))
   }
   
   if (req.params.department === undefined ) {
     
-    return next(new restify.InvalidArgumentError('department must be supplied'))
+    return next(new restify.InvalidArgumentError('phone must be supplied'))
   }
-  if (req.params.doctor === undefined ) {
-    
-    return next(new restify.InvalidArgumentError('doctor must be supplied'))
-  }
+
   var newPatient = {
-		first_name: req.params.first_name, 
-    last_name: req.params.last_name,
-    address: req.params.address,
-    date_of_birth: req.params.date_of_birth,
-    department: req.params.department,
-    doctor: req.params.doctor
+		
+   name : req.params.last_name,
+    email: req.params.address,
+    street: req.params.date_of_birth,
+    city: req.params.department,
+    phone: req.params.doctor
 	}
 
   // Create the user using the persistence engine
